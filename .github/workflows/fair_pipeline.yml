@@ -17,13 +17,14 @@ jobs:
   validate_qa:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
     env:
       QA_PACKAGE_DIR: 'QADir'
     name: 'validate against QA env'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: docker://gscloudsolutions/devops-mate:stable
       - run: ls
       - run: echo 'Creating a Git Diff based artifact/package'
       - run: echo $GITHUB_WORKSPACE
