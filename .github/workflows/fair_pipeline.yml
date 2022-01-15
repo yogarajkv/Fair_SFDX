@@ -28,4 +28,7 @@ jobs:
       - run: ls
       - run: echo 'Creating a Git Diff based artifact/package'
       - run: echo $GITHUB_WORKSPACE
-      - run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_REF || if test $? -eq 21; then exit 0; else exit 1; fi
+      - run: echo $GITHUB_RUN_NUMBER
+      - run: echo $GITHUB_WORKSPACE/$QA_PACKAGE_DIR
+      - run: echo $GITHUB_REF
+      - run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/master || if test $? -eq 21; then exit 0; else exit 1; fi
