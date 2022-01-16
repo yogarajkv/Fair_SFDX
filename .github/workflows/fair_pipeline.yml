@@ -25,16 +25,22 @@ jobs:
       QA_ORG_PASSWORD: '6y8RF!!5'
       QA_ORG_TYPE: 'SANDBOX'
       TEST_LEVEL: 'RunSpecifiedTests'
+      CI_CD_PROVIDER: 'BBPipelines'
+      LOGGING_LEVEL: 'debug'
     name: 'validate against QA env'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v1
-      - run: echo "$GITHUB_CONTEXT"
-      - run: echo "$GITHUB_PR_DESTINATION_BRANCH"
-      - run: echo 'Creating a Git Diff based artifact/package'
-      - run: echo $GITHUB_WORKSPACE
-      - run: echo $GITHUB_RUN_NUMBER
-      - run: echo $GITHUB_WORKSPACE/$QA_PACKAGE_DIR
-      - run: echo $GITHUB_REF
-      - run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'INT Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "CC_AccountServiceTest" -l ${TEST_LEVEL}
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+      - name: Debug logs
+        run: |
+          echo "$GITHUB_CONTEXT"
+          echo "$GITHUB_PR_DESTINATION_BRANCH"
+          sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
+      - name: Archive Deployment Package
+        uses: actions/upload-artifact@v2
+        with:
+          path: $GITHUB_WORKSPACE/$QA_PACKAGE_DIR
+      - name: Validate against QA
+        run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "CC_AccountServiceTest" -l ${TEST_LEVEL}
