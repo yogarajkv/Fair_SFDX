@@ -22,7 +22,7 @@ jobs:
       GITHUB_CONTEXT: ${{ toJSON(github) }}
       GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
       QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
-      QA_ORG_PASSWORD: '6y8RF!!5'
+      QA_ORG_PASSWORD: '6y8RF!!56p7vJh1ZDTJBKXYNKUd2L3FN'
       QA_ORG_TYPE: 'SANDBOX'
       TEST_LEVEL: 'RunSpecifiedTests'
       CI_CD_PROVIDER: 'BBPipelines'
