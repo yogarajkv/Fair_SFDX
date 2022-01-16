@@ -38,4 +38,4 @@ jobs:
       - run: echo $GITHUB_RUN_NUMBER
       - run: echo $GITHUB_WORKSPACE/$QA_PACKAGE_DIR
       - run: echo $GITHUB_REF
-      - run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'INT Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "CC_AccountServiceTest" -l ${TEST_LEVEL}
+      - run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "CC_AccountServiceTest" -l ${TEST_LEVEL}
