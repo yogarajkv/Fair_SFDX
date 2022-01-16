@@ -38,6 +38,7 @@ jobs:
       - name: Archive Deployment Package
         uses: actions/upload-artifact@v2
         with:
+          name: fair_ci_cd_artifact
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
           
   # This workflow contains a single job called "validate_qa"
@@ -49,6 +50,12 @@ jobs:
     needs: create_deployment_archieve
     name: 'validate against QA env'
     steps:
+      - name: Downloading artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: fair_ci_cd_artifact
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
+          
       - name: Validate against QA
         run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
   validate_uat:
@@ -59,6 +66,12 @@ jobs:
     needs: create_deployment_archieve
     name: 'validate against UAT env'
     steps:
+      - name: Downloading artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: fair_ci_cd_artifact
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
+          
       - name: Validate against UAT
         run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
 
