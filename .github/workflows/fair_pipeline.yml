@@ -1,46 +1,67 @@
 name: Fair_Pipeline
+# env variables for this workflow
+env:
+  GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
+  QA_PACKAGE_DIR: 'QADir'
+  UAT_PACKAGE_DIR: 'UATDir'
+  PROD_PACKAGE_DIR: 'ProdDir'
+  QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  QA_ORG_PASSWORD: 'oJZ673Mkc2ymE7MBtFCoACxBSHYegSVPuMnJ'
+  UAT_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  UAT_ORG_PASSWORD: 'oJZ673Mkc2ymE7MBtFCoACxBSHYegSVPuMnJ'
+  PROD_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  PROD_ORG_PASSWORD: 'oJZ673Mkc2ymE7MBtFCoACxBSHYegSVPuMnJ'
+  QA_ORG_TYPE: 'PRODUCTION'
+  PROD_ORG_TYPE: 'SANDBOX'
+  TEST_LEVEL: 'RunSpecifiedTests'
+  CI_CD_PROVIDER: 'BBPipelines'
+  LOGGING_LEVEL: 'debug'
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
     branches: [ master ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  create_deployment_archieve:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+      - name: Creating Deployment Package for QA Org Valdation
+        run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
+      - name: Archive Deployment Package
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
+          
+  # This workflow contains a single job called "validate_qa"
   validate_qa:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    env:
-      QA_PACKAGE_DIR: 'QADir'
-      GITHUB_CONTEXT: ${{ toJSON(github) }}
-      GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
-      QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
-      QA_ORG_PASSWORD: 'oJZ673Mkc2ymE7MBtFCoACxBSHYegSVPuMnJ'
-      QA_ORG_TYPE: 'PRODUCTION'
-      TEST_LEVEL: 'RunSpecifiedTests'
-      CI_CD_PROVIDER: 'BBPipelines'
-      LOGGING_LEVEL: 'debug'
+    needs: create_deployment_archieve
     name: 'validate against QA env'
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout Repository
-        uses: actions/checkout@v1
-      - name: Debug logs
-        run: |
-          echo "$GITHUB_CONTEXT"
-          echo "$GITHUB_PR_DESTINATION_BRANCH"
-          sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
-      - name: Archive Deployment Package
-        uses: actions/upload-artifact@v2
-        with:
-          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
       - name: Validate against QA
         run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+  validate_uat:
+   # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+    needs: create_deployment_archieve
+    name: 'validate against UAT env'
+    steps:
+      - name: Validate against UAT
+        run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+
+  
+    
+        
