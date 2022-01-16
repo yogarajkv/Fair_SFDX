@@ -97,6 +97,7 @@ jobs:
       image: gscloudsolutions/devops-mate:stable
     needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod ]
     name: 'PR-Deploy QA Sandbox'
+    environment: 'QA'
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
@@ -113,6 +114,7 @@ jobs:
       image: gscloudsolutions/devops-mate:stable
     needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa ]
     name: 'PR-Deploy UAT Sandbox'
+    environment: 'UAT'
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
