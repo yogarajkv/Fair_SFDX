@@ -17,6 +17,7 @@ env:
   CI_CD_PROVIDER: 'BBPipelines'
   LOGGING_LEVEL: 'debug'
   MANIFEST_VERSION: 52.0
+  SLACK_NOTIFICATION_URI: ${{ secrets.SLACK_NOTIFICATION_URI }}
 
 # Controls when the workflow will run
 on:
@@ -59,7 +60,7 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
           
       - name: Validate against QA
-        run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+        run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
   validate_uat:
    # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -75,7 +76,7 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
           
       - name: Validate against UAT
-        run: sfDeploy mdapipackage -b true -c true -u $UAT_ORG_USERNAME -s $UAT_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+        run: sfDeploy mdapipackage -b true -c true -u $UAT_ORG_USERNAME -s $UAT_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'UAT Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
  
   validate_prod:
    # The type of runner that the job will run on
@@ -92,7 +93,7 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
           
       - name: Validate against Production
-        run: sfDeploy mdapipackage -b true -c true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+        run: sfDeploy mdapipackage -b true -c true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE --notificationTitle 'Production Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
   
   deploy_qa:
    # The type of runner that the job will run on
@@ -110,7 +111,7 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
           
       - name: Deploy QA Sandbox
-        run: sfDeploy mdapipackage -b true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+        run: sfDeploy mdapipackage -b true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
   
   deploy_uat:
    # The type of runner that the job will run on
@@ -128,7 +129,7 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
           
       - name: Deploy UAT Sandbox
-        run: sfDeploy mdapipackage -b true -u $UAT_ORG_USERNAME -s $UAT_ORG_PASSWORD -t $QA_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+        run: sfDeploy mdapipackage -b true -u $UAT_ORG_USERNAME -s $UAT_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'UAT Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
   
   deploy_prod:
    # The type of runner that the job will run on
@@ -146,4 +147,4 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
           
       - name: Deploy Production
-        run: sfDeploy mdapipackage -b true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+        run: sfDeploy mdapipackage -b true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE --notificationTitle 'Production Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
