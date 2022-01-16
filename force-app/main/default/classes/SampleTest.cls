@@ -3,6 +3,6 @@ public class SampleTest {
 
     @isTest
     static void testSampleMethod(){
-        System.debug('Testing');
+        System.assertEquals(1, 0);
     }
 }
