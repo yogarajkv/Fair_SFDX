@@ -16,6 +16,7 @@ env:
   TEST_LEVEL: 'RunSpecifiedTests'
   CI_CD_PROVIDER: 'BBPipelines'
   LOGGING_LEVEL: 'debug'
+  MANIFEST_VERSION: 52.0
 
 # Controls when the workflow will run
 on:
