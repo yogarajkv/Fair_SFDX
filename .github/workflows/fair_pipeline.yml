@@ -21,11 +21,13 @@ jobs:
       image: gscloudsolutions/devops-mate:stable
     env:
       QA_PACKAGE_DIR: 'QADir'
+      GITHUB_CONTEXT: ${{ toJSON(github) }}
     name: 'validate against QA env'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v1
+      - run: echo "$GITHUB_CONTEXT"
       - run: echo 'Creating a Git Diff based artifact/package'
       - run: echo $GITHUB_WORKSPACE
       - run: echo $GITHUB_RUN_NUMBER
