@@ -3,8 +3,6 @@ name: Fair_Pipeline
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    branches: master
   pull_request:
     branches: [ master ]
 
@@ -22,12 +20,14 @@ jobs:
     env:
       QA_PACKAGE_DIR: 'QADir'
       GITHUB_CONTEXT: ${{ toJSON(github) }}
+      GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
     name: 'validate against QA env'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v1
       - run: echo "$GITHUB_CONTEXT"
+      - run: echo "$GITHUB_PR_DESTINATION_BRANCH"
       - run: echo 'Creating a Git Diff based artifact/package'
       - run: echo $GITHUB_WORKSPACE
       - run: echo $GITHUB_RUN_NUMBER
