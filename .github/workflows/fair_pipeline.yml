@@ -25,6 +25,7 @@ jobs:
       QA_ORG_PASSWORD: '6y8RF!!5'
       QA_ORG_TYPE: 'SANDBOX'
       TEST_LEVEL: 'RunSpecifiedTests'
+      CI_CD_PROVIDER: 'BBPipelines'
     name: 'validate against QA env'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
