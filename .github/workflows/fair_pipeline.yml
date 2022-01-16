@@ -25,7 +25,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - run: ls
+      - uses: actions/checkout@v1
       - run: echo 'Creating a Git Diff based artifact/package'
       - run: echo $GITHUB_WORKSPACE
       - run: echo $GITHUB_RUN_NUMBER
