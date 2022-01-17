@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa, deploy_uat ]
+    needs: [ create_deployment_archieve ]
     name: 'PR-Deploy Prod'
     environment: 'Prod'
     steps:
