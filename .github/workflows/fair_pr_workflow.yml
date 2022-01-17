@@ -15,6 +15,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repository
         uses: actions/checkout@v1
+      - name: Archive Deployment checkout Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: fair_ci_cd_artifact1
+          path: ${{ github.workspace }}/*
+          retention-days: 14
 
       - name: Set Environment Variables
         uses: ./.github/actions/setenvvars
