@@ -1,24 +1,4 @@
 name: Fair_Pipeline
-# env variables for this workflow
-env:
-  GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
-  QA_PACKAGE_DIR: 'QADir'
-  UAT_PACKAGE_DIR: 'UATDir'
-  PROD_PACKAGE_DIR: 'ProdDir'
-  QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
-  QA_ORG_PASSWORD: ${{ secrets.QA_ORG_PASSWORD }}
-  UAT_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
-  UAT_ORG_PASSWORD:  ${{ secrets.UAT_ORG_PASSWORD }}
-  PROD_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
-  PROD_ORG_PASSWORD: '${{ secrets.PROD_ORG_PASSWORD }}'
-  QA_ORG_TYPE: 'PRODUCTION'
-  PROD_ORG_TYPE: 'PRODUCTION'
-  TEST_LEVEL: 'RunSpecifiedTests'
-  CI_CD_PROVIDER: 'AzureDevOps'
-  LOGGING_LEVEL: 'debug'
-  MANIFEST_VERSION: 52.0
-  SLACK_NOTIFICATION_URI: ${{ secrets.SLACK_NOTIFICATION_URI }}
-
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
@@ -33,6 +13,11 @@ jobs:
       image: gscloudsolutions/devops-mate:stable
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Set Environment Variables
+        users: ./.github/actions/setenvvars
+        with:
+          varFilePath: ./.github/variables/environmentvariables.env
+
       - name: Checkout Repository
         uses: actions/checkout@v1
       - name: Creating Deployment Package for QA Org Valdation
