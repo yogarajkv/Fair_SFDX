@@ -1,0 +1,63 @@
+name: Fair_Main_Merge_Workflow
+# env variables for this workflow
+env:
+  GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
+  QA_PACKAGE_DIR: 'QADir'
+  UAT_PACKAGE_DIR: 'UATDir'
+  PROD_PACKAGE_DIR: 'ProdDir'
+  QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  QA_ORG_PASSWORD: ${{ secrets.QA_ORG_PASSWORD }}
+  UAT_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  UAT_ORG_PASSWORD:  ${{ secrets.UAT_ORG_PASSWORD }}
+  PROD_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  PROD_ORG_PASSWORD: '${{ secrets.PROD_ORG_PASSWORD }}'
+  QA_ORG_TYPE: 'PRODUCTION'
+  PROD_ORG_TYPE: 'PRODUCTION'
+  TEST_LEVEL: 'RunSpecifiedTests'
+  CI_CD_PROVIDER: 'AzureDevOps'
+  LOGGING_LEVEL: 'debug'
+  MANIFEST_VERSION: 52.0
+  SLACK_NOTIFICATION_URI: ${{ secrets.SLACK_NOTIFICATION_URI }}
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  create_deployment_archieve:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+      - name: Creating Deployment Package for QA Org Valdation
+        run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
+      - name: Archive Deployment Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: fair_ci_cd_artifact
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
+          retention-days: 14
+ 
+  deploy_prod:
+   # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+    needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa, deploy_uat ]
+    name: 'PR-Deploy Prod'
+    environment: 'Prod'
+    steps:
+      - name: Downloading artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: fair_ci_cd_artifact
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
+          
+      - name: Deploy Production
+        run: sfDeploy mdapipackage -b true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE --notificationTitle 'Production Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
