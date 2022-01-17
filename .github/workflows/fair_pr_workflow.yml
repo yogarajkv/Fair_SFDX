@@ -13,13 +13,14 @@ jobs:
       image: gscloudsolutions/devops-mate:stable
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repository
+          uses: actions/checkout@v1
+
       - name: Set Environment Variables
         uses: ./.github/actions/setenvvars
         with:
           varFilePath: ./.github/variables/environmentvariables.env
 
-      - name: Checkout Repository
-        uses: actions/checkout@v1
       - name: Creating Deployment Package for QA Org Valdation
         run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
       - name: Archive Deployment Package
