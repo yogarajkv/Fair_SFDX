@@ -1,0 +1,47 @@
+name: Fair_Custom_Workflow
+
+env:
+  QA_ORG_TYPE: PRODUCTION
+
+on:
+  workflow_dispatch:
+    inputs:
+      CHANGESET_NAME:
+        description: 'Changeset name'
+        required: true
+      COMMIT_MESSAGE:
+        description: 'Commit message'
+        required: true
+        default: 'Created from Changeset'
+      BRANCH_NAME:
+        description: 'Branch Name'
+        required: true
+        default: 'Feature Branch Name'
+      ORG_USERNAME:
+        description: 'Salesforce Org Username'
+        required: true
+      ORG_PASSWORD:
+        description: 'Salesforce Org Password with Security Token'
+        required: true
+
+jobs:
+  checkout_git_branch:
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+      
+    steps:
+      - name: Retrieve Changeset
+        run: |
+          echo 'Checking out git branch'
+          echo $GITHUB_WORKSPACE
+          echo $CHANGESET_NAME
+          echo $COMMIT_MESSAGE
+          echo $BRANCH_NAME
+          git checkout -b "feature/$BRANCH_NAME"
+          echo 'Pulling changeset and commiting it to checked out branch'
+          sfRetrieve src-format -u ORG_USERNAME -s ORG_PASSWORD -t ${{ env.QA_ORG_TYPE }} -n "$CHANGESET_NAME" -p $GITHUB_WORKSPACE
+          ls -a
+          git add --all
+          git commit -m "$COMMIT_MESSAGE"
+          git push
