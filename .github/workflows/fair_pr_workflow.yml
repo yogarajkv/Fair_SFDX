@@ -1,5 +1,6 @@
-name: Fair_Pipeline
-# env variables for this workflow
+#Unique name for this workflow
+name: Fair_PR_workflow
+
 env:
   GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
   QA_PACKAGE_DIR: 'QADir'
@@ -14,30 +15,31 @@ env:
   QA_ORG_TYPE: 'PRODUCTION'
   PROD_ORG_TYPE: 'PRODUCTION'
   TEST_LEVEL: 'RunSpecifiedTests'
-  CI_CD_PROVIDER: 'GithubActions'
+  CI_CD_PROVIDER: 'AzureDevOps'
   LOGGING_LEVEL: 'debug'
   MANIFEST_VERSION: 52.0
-  SLACK_NOTIFICATION_URI: 'https://hooks.slack.com/services/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'
-  SLACK_MESSAGES: 'on'
 
-# Controls when the workflow will run
+
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
     branches: [ master ]
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    
+# Jobs to be executed
 jobs:
-  create_deployment_archieve:
-    # The type of runner that the job will run on
+  # create deployment archive
+  create_deployment_archive:
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checkout the source code
       - name: Checkout Repository
         uses: actions/checkout@v1
+
       - name: Creating Deployment Package for QA Org Valdation
         run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
+      #Archive deployment package
       - name: Archive Deployment Package
         uses: actions/upload-artifact@v2
         with:
@@ -45,14 +47,13 @@ jobs:
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
           retention-days: 14
 
-  # This workflow contains a single job called "validate_qa"
   validate_qa:
-    # The type of runner that the job will run on
+    name: 'PR-Validate against QA env'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
     needs: create_deployment_archieve
-    name: 'PR-Validate against QA env'
+
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
@@ -62,13 +63,14 @@ jobs:
 
       - name: Validate against QA
         run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+
   validate_uat:
-    # The type of runner that the job will run on
+    name: 'PR-Validate against UAT env'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
     needs: create_deployment_archieve
-    name: 'PR-Validate against UAT env'
+
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
@@ -80,12 +82,12 @@ jobs:
         run: sfDeploy mdapipackage -b true -c true -u $UAT_ORG_USERNAME -s $UAT_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'UAT Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
 
   validate_prod:
-    # The type of runner that the job will run on
+    name: 'PR-Validate against Prod env'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
     needs: create_deployment_archieve
-    name: 'PR-Validate against Prod env'
+
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
@@ -97,12 +99,12 @@ jobs:
         run: sfDeploy mdapipackage -b true -c true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE --notificationTitle 'Production Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
 
   deploy_qa:
-    # The type of runner that the job will run on
+    name: 'PR-Deploy QA Sandbox'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
     needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod ]
-    name: 'PR-Deploy QA Sandbox'
+
     environment: 'QA'
     steps:
       - name: Downloading artifact
@@ -115,13 +117,13 @@ jobs:
         run: sfDeploy mdapipackage -b true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
 
   deploy_uat:
-    # The type of runner that the job will run on
+    name: 'PR-Deploy UAT Sandbox'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
     needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa ]
-    name: 'PR-Deploy UAT Sandbox'
     environment: 'UAT'
+
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
@@ -133,13 +135,13 @@ jobs:
         run: sfDeploy mdapipackage -b true -u $UAT_ORG_USERNAME -s $UAT_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'UAT Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
 
   deploy_prod:
-    # The type of runner that the job will run on
+    name: 'PR-Deploy Prod'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate-test:github
+      image: gscloudsolutions/devops-mate:stable
     needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa, deploy_uat ]
-    name: 'PR-Deploy Prod'
     environment: 'Prod'
+
     steps:
       - name: Downloading artifact
         uses: actions/download-artifact@v2
