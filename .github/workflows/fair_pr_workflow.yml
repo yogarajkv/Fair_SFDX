@@ -49,8 +49,8 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
-     # image: gscloudsolutions/devops-mate:stable
-      image: gscloudsolutions/devops-mate-test:github
+     image: gscloudsolutions/devops-mate:stable
+     
     needs: create_deployment_archieve
     name: 'PR-Validate against QA env'
     steps:
