@@ -17,7 +17,7 @@ env:
   CI_CD_PROVIDER: 'GithubActions'
   LOGGING_LEVEL: 'debug'
   MANIFEST_VERSION: 52.0
-  SLACK_NOTIFICATION_URI: ${{ secrets.SLACK_NOTIFICATION_URI }}
+  SLACK_NOTIFICATION_URI: 'https://hooks.slack.com/services/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'
 
 # Controls when the workflow will run
 on:
