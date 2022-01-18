@@ -18,8 +18,6 @@ env:
   LOGGING_LEVEL: 'debug'
   MANIFEST_VERSION: 52.0
   SLACK_NOTIFICATION_URI: ${{ secrets.SLACK_NOTIFICATION_URI }}
-  DEVOPS_MATE_IMAGE: 'gscloudsolutions/devops-mate-test:github'
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 # Controls when the workflow will run
 on:
