@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: create_deployment_archieve
+    needs: create_deployment_archive
 
     steps:
       - name: Downloading artifact
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: create_deployment_archieve
+    needs: create_deployment_archive
 
     steps:
       - name: Downloading artifact
@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: create_deployment_archieve
+    needs: create_deployment_archive
 
     steps:
       - name: Downloading artifact
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod ]
+    needs: [ create_deployment_archive, validate_qa, validate_uat, validate_prod ]
 
     environment: 'QA'
     steps:
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa ]
+    needs: [ create_deployment_archive, validate_qa, validate_uat, validate_prod, deploy_qa ]
     environment: 'UAT'
 
     steps:
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: [ create_deployment_archieve, validate_qa, validate_uat, validate_prod, deploy_qa, deploy_uat ]
+    needs: [ create_deployment_archive, validate_qa, validate_uat, validate_prod, deploy_qa, deploy_uat ]
     environment: 'Prod'
 
     steps:

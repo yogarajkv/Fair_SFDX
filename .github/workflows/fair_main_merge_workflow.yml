@@ -22,7 +22,7 @@ on:
   push:
     branches: [ master ]
 jobs:
-  create_deployment_archieve:
+  create_deployment_archive:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate:stable
-    needs: [ create_deployment_archieve ]
+    needs: [ create_deployment_archive ]
     environment: 'Prod'
 
     steps:
