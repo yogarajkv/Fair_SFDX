@@ -18,6 +18,7 @@ env:
   LOGGING_LEVEL: 'debug'
   MANIFEST_VERSION: 52.0
   SLACK_NOTIFICATION_URI: 'https://hooks.slack.com/services/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'
+  SLACK_MESSAGES: 'on'
 
 # Controls when the workflow will run
 on:
