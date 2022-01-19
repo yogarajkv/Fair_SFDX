@@ -1,0 +1,60 @@
+#Unique name for this workflow
+name: PR_workflow
+
+env:
+  GITHUB_PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
+  QA_PACKAGE_DIR: 'QADir'
+  QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
+  QA_ORG_PASSWORD: ${{ secrets.QA_ORG_PASSWORD }}
+  QA_ORG_TYPE: 'PRODUCTION'
+  PROD_ORG_TYPE: 'PRODUCTION'
+  TEST_LEVEL: 'RunSpecifiedTests'
+  CI_CD_PROVIDER: 'AzureDevOps'
+  LOGGING_LEVEL: 'debug'
+  MANIFEST_VERSION: 52.0
+
+
+on:
+  pull_request:
+    branches: [ master ]
+    
+# Jobs to be executed
+jobs:
+  # create deployment archive
+  create_deployment_archive:
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+
+    steps:
+      # Checkout the source code
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+
+      - name: Creating Deployment Package for QA Org Valdation
+        run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER -o origin/$GITHUB_PR_DESTINATION_BRANCH || if test $? -eq 21; then exit 0; else exit 1; fi
+      
+      #Archive deployment package
+      - name: Archive Deployment Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: fair_ci_cd_artifact
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
+          retention-days: 14
+
+  validate_qa:
+    name: 'PR-Validate against QA env'
+    runs-on: ubuntu-latest
+    container:
+      image: gscloudsolutions/devops-mate:stable
+    needs: create_deployment_archive
+
+    steps:
+      - name: Downloading artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: fair_ci_cd_artifact
+          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
+
+      - name: Validate against QA
+        run: sfDeploy mdapipackage -b true -c true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Validation' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
