@@ -4,6 +4,9 @@ env:
   DEV_ORG_TYPE: PRODUCTION
   DEV_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
   DEV_ORG_PASSWORD: ${{ secrets.DEV_ORG_PASSWORD }}
+  BRANCH_NAME: ${{ github.event.inputs.BRANCH_NAME }}
+  COMMIT_MESSAGE: ${{ github.event.inputs.COMMIT_MESSAGE }}
+  CHANGESET_NAME: ${{ github.event.inputs.CHANGESET_NAME }}
 
 on:
   workflow_dispatch:
@@ -41,9 +44,9 @@ jobs:
         run: |
           echo 'Checking out git branch'
           echo $GITHUB_WORKSPACE
-          echo $CHANGESET_NAME
+          echo ${{ env.BRANCH_NAME }}
           echo $COMMIT_MESSAGE
-          echo $BRANCH_NAME
+          echo $CHANGESET_NAME
           git checkout -b "feature/$BRANCH_NAME"
           echo 'Pulling changeset and commiting it to checked out branch'
           sfRetrieve src-format -u ${{ env.DEV_ORG_USERNAME }} -s ${{ env.DEV_ORG_PASSWORD }} -t ${{ env.DEV_ORG_TYPE }} -n "$CHANGESET_NAME" -p $GITHUB_WORKSPACE
