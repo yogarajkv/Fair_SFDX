@@ -46,7 +46,7 @@ jobs:
           echo $BRANCH_NAME
           git checkout -b "feature/$BRANCH_NAME"
           echo 'Pulling changeset and commiting it to checked out branch'
-          sfRetrieve src-format -u ${{ env.DEV_ORG_USERNAME }} -s ${{ DEV_ORG_PASSWORD }} -t ${{ env.DEV_ORG_TYPE }} -n "$CHANGESET_NAME" -p $GITHUB_WORKSPACE
+          sfRetrieve src-format -u ${{ env.DEV_ORG_USERNAME }} -s ${{ env.DEV_ORG_PASSWORD }} -t ${{ env.DEV_ORG_TYPE }} -n "$CHANGESET_NAME" -p $GITHUB_WORKSPACE
           ls -a
           git add --all
           git commit -m "$COMMIT_MESSAGE"
