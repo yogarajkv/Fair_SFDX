@@ -7,7 +7,7 @@ env:
   BRANCH_NAME: ${{ github.event.inputs.BRANCH_NAME }}
   COMMIT_MESSAGE: ${{ github.event.inputs.COMMIT_MESSAGE }}
   CHANGESET_NAME: ${{ github.event.inputs.CHANGESET_NAME }}
-  GH_USERNAME: ${{ github.event.actor }}
+  GH_USERNAME: ${{ github.actor }}
 
 on:
   workflow_dispatch:
