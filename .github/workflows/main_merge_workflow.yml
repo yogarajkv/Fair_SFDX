@@ -25,6 +25,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v1
 
+      - name: Deployment Info
+        uses: sfDeploymentInfo get -u $QA_ORG_USERNAME -t $QA_ORG_TYPE -i $GITHUB_RUN_NUMBER -n All -s $QA_ORG_PASSWORD
+
       - name: Creating Deployment Package for QA Org Valdation
         run: sfPackages source-combined -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER || if test $? -eq 21; then exit 0; else exit 1; fi
 
