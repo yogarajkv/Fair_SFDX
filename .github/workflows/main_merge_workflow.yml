@@ -2,7 +2,7 @@ name: Main_Merge_Workflow
 
 env:
   GITHUB_PR_DESTINATION_BRANCH: ${{ github.ref_name }}
-  QA_PACKAGE_DIR: 'QADir'
+  QA_PACKAGE_DIR: 'QADir1'
   QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
   QA_ORG_PASSWORD: ${{ secrets.QA_ORG_PASSWORD }}
   QA_ORG_TYPE: 'PRODUCTION'
@@ -52,22 +52,3 @@ jobs:
 
       - name: Deploy QA Sandbox
         run: sfDeploy mdapipackage -b true -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
-  
-  deploy_prod:
-    name: 'Deploy Prod'
-    runs-on: ubuntu-latest
-    container:
-      image: gscloudsolutions/devops-mate:stable
-    needs: [ create_deployment_archive, deploy_qa ]
-    
-    environment: 'Prod'
-
-    steps:
-      - name: Downloading artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: fair_ci_cd_artifact
-          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
-          
-      - name: Deploy Production
-        run: sfDeploy mdapipackage -b true -u $PROD_ORG_USERNAME -s $PROD_ORG_PASSWORD -t $PROD_ORG_TYPE --notificationTitle 'Production Sandbox Deployment' -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
