@@ -10,9 +10,4 @@ public class SampleTest {
     static void testSampleMethod1(){
         System.assertEquals(1, 1);
     }
-
-    @isTest
-    static void testSampleMethod2(){
-        System.assertEquals(1, 1);
-    }
 }
