@@ -17,7 +17,7 @@ on:
     branches: [ master ]
     
 jobs:
-  create_deployment_archive:
+  deploy_qa:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate-test:github
@@ -31,27 +31,12 @@ jobs:
       - name: Creating Deployment Package for QA Org Valdation
         run: sfPackages source-combined -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER || if test $? -eq 21; then exit 0; else exit 1; fi
 
+      - name: Deploy QA Sandbox
+        run: sfDeploy mdapipackage -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Deployment' -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
+
       - name: Archive Deployment Package
         uses: actions/upload-artifact@v2
         with:
           name: fair_ci_cd_artifact
           path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/*
           retention-days: 14
- 
-  deploy_qa:
-    name: 'PR-Deploy QA Sandbox'
-    runs-on: ubuntu-latest
-    container:
-      image: gscloudsolutions/devops-mate-test:github
-    needs: [ create_deployment_archive ]
-
-    environment: 'QA'
-    steps:
-      - name: Downloading artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: fair_ci_cd_artifact
-          path: ${{ github.workspace }}/${{ env.QA_PACKAGE_DIR }}/
-
-      - name: Deploy QA Sandbox
-        run: sfDeploy mdapipackage -u $QA_ORG_USERNAME -s $QA_ORG_PASSWORD -t $QA_ORG_TYPE --notificationTitle 'QA Sandbox Deployment' -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR --successSHA $GITHUB_SHA -i $GITHUB_RUN_NUMBER -k "SampleTest" -l ${TEST_LEVEL}
