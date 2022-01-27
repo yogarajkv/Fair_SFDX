@@ -17,6 +17,8 @@ env:
 on:
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.github/**'
     
 # Jobs to be executed
 jobs:

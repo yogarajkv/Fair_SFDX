@@ -1,7 +1,6 @@
 name: Main_Merge_Workflow
 
 env:
-  GITHUB_PR_DESTINATION_BRANCH: ${{ github.ref_name }}
   QA_PACKAGE_DIR: 'QADir'
   QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
   QA_ORG_PASSWORD: ${{ secrets.QA_ORG_PASSWORD }}
@@ -23,6 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gscloudsolutions/devops-mate-test:github
+
+    environment: 'QA'
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v1
