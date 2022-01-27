@@ -2,7 +2,7 @@ name: Main_Merge_Workflow
 
 env:
   GITHUB_PR_DESTINATION_BRANCH: ${{ github.ref_name }}
-  QA_PACKAGE_DIR: 'QADir1'
+  QA_PACKAGE_DIR: 'QADir'
   QA_ORG_USERNAME: 'yogaraj@gscloudsolutions.com.enterprise'
   QA_ORG_PASSWORD: ${{ secrets.QA_ORG_PASSWORD }}
   QA_ORG_TYPE: 'PRODUCTION'
@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Creating Deployment Package for QA Org Valdation
-        run: sfPackages source-combined -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER || if test $? -eq 21; then exit 0; else exit 1; fi
+        run: sfPackages source-combined -v 1.0.0.$GITHUB_RUN_NUMBER -p $GITHUB_WORKSPACE/$QA_PACKAGE_DIR -n HEAD -i $GITHUB_RUN_NUMBER || if test $? -eq 21; then exit 0; else exit 1; fi
 
       - name: Archive Deployment Package
         uses: actions/upload-artifact@v2
