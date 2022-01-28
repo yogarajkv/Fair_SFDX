@@ -13,6 +13,7 @@ env:
   LOGGING_LEVEL: 'debug'
   MANIFEST_VERSION: 52.0
   SLACK_NOTIFICATION_URI: 'https://hooks.slack.com/services/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'
+  SLACK_MESSAGES: 'on'
 
 
 on:
@@ -27,7 +28,7 @@ jobs:
   create_deployment_archive:
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate:stable
+      image: gscloudsolutions/devops-mate-test:github
 
     steps:
       # Checkout the source code
@@ -49,7 +50,7 @@ jobs:
     name: 'PR-Validate against QA env'
     runs-on: ubuntu-latest
     container:
-      image: gscloudsolutions/devops-mate:stable
+      image: gscloudsolutions/devops-mate-test:github
     needs: create_deployment_archive
 
     steps:
