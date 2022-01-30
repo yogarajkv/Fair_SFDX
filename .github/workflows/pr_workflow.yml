@@ -14,6 +14,7 @@ env:
   MANIFEST_VERSION: 52.0
   SLACK_NOTIFICATION_URI: 'https://hooks.slack.com/services/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'
   SLACK_MESSAGES: 'on'
+  GITHUB_TOKEN: ${{ secrets.MY_PSA }}
 
 
 on:
