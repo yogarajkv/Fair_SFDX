@@ -1,0 +1,21 @@
+name: 'Prod Deployment'
+
+on:
+  workflow_dispatch:
+    inputs:
+      ccm:
+        description: 'Change Control Management # from SNOW'
+        required: true
+
+jobs:
+  deploy-staging:
+      name: Staging Deployment
+      runs-on: ubuntu-latest
+  steps:
+      # Checkout the source code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+       - name: 'Changes included in the package'
+        run: |
+          git diff --name-only $(git merge-base GITHUB_REF_NAME main) HEAD
