@@ -18,4 +18,4 @@ jobs:
     
           - name: 'Changes included in the package'
             run: |
-              git diff --name-only $(git merge-base GITHUB_REF_NAME main) HEAD
+              git diff --name-only $(git merge-base ${GITHUB_REF_NAME} main) HEAD
