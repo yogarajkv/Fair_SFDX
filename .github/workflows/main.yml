@@ -19,5 +19,5 @@ jobs:
           - name: 'Changes included in the package'
             run: |
               echo ${GITHUB_REF_NAME}
-              echo git merge-base ${GITHUB_REF_NAME} master
-              git diff --name-only $(git merge-base ${GITHUB_REF_NAME} master) HEAD
+              echo git merge-base ${GITHUB_REF_NAME} origin/master
+              git diff --name-only $(git merge-base ${GITHUB_REF_NAME} origin/master) HEAD
